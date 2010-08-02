@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'rubygems'
 
-gem 'jferris-mocha', '>= 0.9.5.0.1241126838'
+gem 'bourne'
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), *%w[.. vendor ginger lib])
 $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
@@ -12,7 +12,7 @@ require 'mocha'
 require 'ginger'
 
 require 'action_controller'
-require 'action_controller/test_process'
+require 'action_controller/test_case'
 require 'active_record'
 require 'active_record/base'
 require 'active_support'

@@ -1,7 +1,7 @@
-require File.dirname(__FILE__) + '/helper'
+require File.expand_path(File.dirname(__FILE__)) + '/helper'
 require 'rubygems'
 
-require File.dirname(__FILE__) + '/../lib/hoptoad_tasks'
+require File.expand_path(File.dirname(__FILE__))  + '/../lib/hoptoad_tasks'
 require 'fakeweb'
 
 FakeWeb.allow_net_connect = false

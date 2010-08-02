@@ -7,9 +7,14 @@ module HoptoadNotifier
   module Rails
     def self.initialize
       if defined?(ActionController::Base)
-        ActionController::Base.send(:include, HoptoadNotifier::Rails::ActionControllerCatcher)
-        ActionController::Base.send(:include, HoptoadNotifier::Rails::ErrorLookup)
+        #ActionController::Base.send(:include, HoptoadNotifier::Rails::ActionControllerCatcher)
+        #ActionController::Base.send(:include, HoptoadNotifier::Rails::ErrorLookup)
         ActionController::Base.send(:include, HoptoadNotifier::Rails::ControllerMethods)
+      end
+
+      if defined?(ActionDispatch::Middleware)
+        ActionDispatch::Middleware.send(:include, HoptoadNotifier::Rails::ActionControllerCatcher)
+        ActionDispatch::Middleware.send(:include, HoptoadNotifier::Rails::ErrorLookup)
       end
 
       rails_logger = if defined?(::Rails.logger)
@@ -34,4 +39,3 @@ module HoptoadNotifier
 end
 
 HoptoadNotifier::Rails.initialize
-
