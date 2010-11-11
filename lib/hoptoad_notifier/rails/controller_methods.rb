@@ -32,7 +32,13 @@ module HoptoadNotifier
           :action           => params[:action],
           :url              => hoptoad_request_url,
           :cgi_data         => hoptoad_filter_if_filtering(request.env) }
+        # if rails3, use these instead:
+        # actionpack/lib/action_dispatch/http/request.rb
+        # actionpack/lib/action_dispatch/http/request.rb
+        #       request.filtered_parameters
+        #       request.filtered_env
       end
+
 
       def hoptoad_filter_if_filtering(hash)
         return hash if ! hash.is_a?(Hash)
