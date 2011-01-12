@@ -10,7 +10,7 @@ module HoptoadNotifier
           HoptoadNotifier.notify(hash_or_exception, hoptoad_request_data)
         end
       end
-      
+
       def hoptoad_local_request?
         if defined?(::Rails.application.config)
           ::Rails.application.config.consider_all_requests_local || request.local?
@@ -35,7 +35,7 @@ module HoptoadNotifier
       end
 
       def hoptoad_filter_if_filtering(hash)
-        return hash if ! hash.is_a?(Hash)
+        return hash unless hash.is_a?(Hash)
 
         if respond_to?(:filter_parameters)
           filter_parameters(hash) rescue hash
