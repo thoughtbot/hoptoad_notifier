@@ -1,8 +1,13 @@
+require 'rubygems'
+require 'bundler'
+require 'bundler/setup'
+require 'appraisal'
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'cucumber/rake/task'
+Bundler::GemHelper.install_tasks
 
 desc 'Default: run unit tests.'
 task :default => [:test, "cucumber:rails:all"]

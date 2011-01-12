@@ -12,3 +12,6 @@ tags
 doc
 pkg
 *.gemspec
+*.gem
+.bundle
+pkg/*

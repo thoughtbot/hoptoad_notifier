@@ -5,7 +5,7 @@ When /^I generate a new Rails application$/ do
   @terminal.cd(TEMP_DIR)
   version_string = ENV['RAILS_VERSION']
 
-  rails3 = version_string =~ /^3/
+  rails3 = (Rails::VERSION::MAJOR == '3')
 
   if rails3
     rails_create_command = 'new'
@@ -13,12 +13,7 @@ When /^I generate a new Rails application$/ do
     rails_create_command = ''
   end
 
-  load_rails = <<-RUBY
-    gem 'rails', '#{version_string}'; \
-    load Gem.bin_path('rails', 'rails', '#{version_string}')
-  RUBY
-
-  @terminal.run(%{ruby -rubygems -e "#{load_rails.strip!}" #{rails_create_command} rails_root})
+  @terminal.run(%{rails #{rails_create_command} rails_root})
   if rails_root_exists?
     @terminal.echo("Generated a Rails #{version_string} application")
   else

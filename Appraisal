@@ -1,0 +1,7 @@
+RAILS_VERSIONS = IO.read('SUPPORTED_RAILS_VERSIONS').strip.split("\n")
+
+RAILS_VERSIONS.each do |version|
+  appraise version do
+    gem rails version
+  end
+end
