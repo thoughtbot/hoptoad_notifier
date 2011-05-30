@@ -15,6 +15,9 @@ class Terminal
   attr_accessor :environment_variables, :invoke_heroku_rake_tasks_locally
 
   def initialize
+    # Makes appraisals work
+    Bundler.require
+
     @cwd = FileUtils.pwd
     @output = ""
     @status = 0
@@ -23,9 +26,7 @@ class Terminal
     @invoke_heroku_rake_tasks_locally = false
 
     @environment_variables = {
-      "GEM_HOME" => LOCAL_GEM_ROOT,
-      "GEM_PATH" => "#{LOCAL_GEM_ROOT}:#{BUILT_GEM_ROOT}",
-      "PATH" => "#{gem_bin_path}:#{ENV['PATH']}"
+      "PATH" => ENV['PATH']
     }
   end
 

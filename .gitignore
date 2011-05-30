@@ -14,3 +14,7 @@ pkg
 *.gemspec
 
 *.rbc
+
+*.gem
+.bundle
+pkg/*

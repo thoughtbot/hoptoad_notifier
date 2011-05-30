@@ -3,9 +3,9 @@ require 'active_support/core_ext/string/inflections'
 
 When /^I generate a new Rails application$/ do
   @terminal.cd(TEMP_DIR)
-  version_string = ENV['RAILS_VERSION']
+  version_string = ENV['BUNDLE_GEMFILE'].scan(/\d\.\d\.\d/).first
 
-  rails3 = version_string =~ /^3/
+  rails3 = Rails::VERSION::MAJOR == 3
 
   if rails3
     rails_create_command = 'new'
@@ -13,13 +13,12 @@ When /^I generate a new Rails application$/ do
     rails_create_command = ''
   end
 
-  load_rails = <<-RUBY
-    gem 'rails', '#{version_string}'; \
-    load Gem.bin_path('rails', 'rails', '#{version_string}')
-  RUBY
-
-  @terminal.run(%{ruby -rrubygems -rthread -e "#{load_rails.strip!}" #{rails_create_command} rails_root})
+  @terminal.run(%{rails #{rails_create_command} rails_root})
   if rails_root_exists?
+    # Yes, this is a hack. It's required because appraisal uses a relative
+    # path for Gemfiles, and once we cd into a different dir we lose track of
+    # them.
+    copy_appraisal_gemfiles_into(rails_root)
     @terminal.echo("Generated a Rails #{version_string} application")
   else
     raise "Unable to generate a Rails application:\n#{@terminal.output}"

@@ -113,6 +113,10 @@ module RailsHelpers
     File.open(rakefile_path, 'wb') { |file| file.write(content) }
   end
 
+  def copy_appraisal_gemfiles_into(dir)
+    FileUtils.cp_r(File.join(PROJECT_ROOT, 'gemfiles'), dir)
+  end
+
   def perform_request(uri, environment = 'production')
     if rails3?
       request_script = <<-SCRIPT

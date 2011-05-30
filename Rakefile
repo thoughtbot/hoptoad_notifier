@@ -1,3 +1,8 @@
+require 'rubygems'
+require 'bundler'
+require 'bundler/setup'
+require 'appraisal'
+
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
@@ -10,7 +15,7 @@ rescue LoadError
 end
 
 desc 'Default: run unit tests.'
-task :default => [:test, "cucumber:rails:all"]
+task :default => [:test]
 
 desc 'Test the hoptoad_notifier gem.'
 Rake::TestTask.new(:test) do |t|
@@ -127,6 +132,8 @@ gemspec = Gem::Specification.new do |s|
   s.add_development_dependency("bourne")
   s.add_development_dependency("nokogiri", '= 1.4.3.1')
   s.add_development_dependency("shoulda")
+  s.add_development_dependency("appraisal", '= 0.3.3')
+  s.add_development_dependency("cucumber")
   s.add_development_dependency("rspec", '~> 2.6.0')
 
   s.authors = ["thoughtbot, inc"]
@@ -151,76 +158,25 @@ task :gemspec do
   end
 end
 
-LOCAL_GEM_ROOT = File.join(GEM_ROOT, 'tmp', 'local_gems').freeze
 RAILS_VERSIONS = IO.read('SUPPORTED_RAILS_VERSIONS').strip.split("\n")
-LOCAL_GEMS = [['sham_rack', nil], ['capistrano', nil], ['sqlite3-ruby', nil], ['sinatra', nil], ['rake', '0.8.7']] +
-  RAILS_VERSIONS.collect { |version| ['rails', version] }
-
-desc "Vendor test gems: Run this once to prepare your test environment"
-task :vendor_test_gems do
-  old_gem_path = ENV['GEM_PATH']
-  old_gem_home = ENV['GEM_HOME']
-  ENV['GEM_PATH'] = LOCAL_GEM_ROOT
-  ENV['GEM_HOME'] = LOCAL_GEM_ROOT
-  LOCAL_GEMS.each do |gem_name, version|
-    gem_file_pattern = [gem_name, version || '*'].compact.join('-')
-    version_option = version ? "-v #{version}" : ''
-    pattern = File.join(LOCAL_GEM_ROOT, 'gems', "#{gem_file_pattern}")
-    existing = Dir.glob(pattern).first
-    unless existing
-      command = "gem install -i #{LOCAL_GEM_ROOT} --no-ri --no-rdoc --backtrace #{version_option} #{gem_name}"
-      puts "Vendoring #{gem_file_pattern}..."
-      unless system("#{command} 2>&1")
-        puts "Command failed: #{command}"
-        exit(1)
-      end
-    end
-  end
-  ENV['GEM_PATH'] = old_gem_path
-  ENV['GEM_HOME'] = old_gem_home
-end
 
 Cucumber::Rake::Task.new(:cucumber) do |t|
   t.fork = true
   t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'progress')]
 end
 
-task :cucumber => [:gemspec, :vendor_test_gems]
+task :cucumber => [:gemspec]
+task :wip => [:gemspec]
 
-def run_rails_cucumbr_task(version, additional_cucumber_args)
-  puts "Testing Rails #{version}"
-  if version.empty?
-    raise "No Rails version specified - make sure ENV['RAILS_VERSION'] is set, e.g. with `rake cucumber:rails:all`"
-  end
-  ENV['RAILS_VERSION'] = version
-  system("cucumber --format #{ENV['CUCUMBER_FORMAT'] || 'progress'} #{additional_cucumber_args} features/rails.feature features/rails_with_js_notifier.feature")
+directory 'tmp'
+# Required because appraisal uses a relative path
+task :copy_gemfiles_to_tmp => ['tmp'] do
+  FileUtils.cp_r('gemfiles', 'tmp')
 end
 
-def define_rails_cucumber_tasks(additional_cucumber_args = '')
-  namespace :rails do
-    RAILS_VERSIONS.each do |version|
-      desc "Test integration of the gem with Rails #{version}"
-      task version => [:gemspec, :vendor_test_gems] do
-        exit 1 unless run_rails_cucumbr_task(version, additional_cucumber_args)
-      end
-    end
-
-    desc "Test integration of the gem with all Rails versions"
-    task :all do
-      results = RAILS_VERSIONS.map do |version|
-        run_rails_cucumbr_task(version, additional_cucumber_args)
-      end
-
-      exit 1 unless results.all?
-    end
+RAILS_VERSIONS.each do |version|
+  namespace :appraisal do
+    # Intentionally providing no description so we don't overwrite the appraisal-provided one
+    task version => [:gemspec, :copy_gemfiles_to_tmp]
   end
 end
-
-namespace :cucumber do
-  namespace :wip do
-    define_rails_cucumber_tasks('--tags @wip')
-  end
-
-  define_rails_cucumber_tasks
-end
-
