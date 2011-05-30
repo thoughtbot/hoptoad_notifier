@@ -5,7 +5,7 @@ When /^I generate a new Rails application$/ do
   @terminal.cd(TEMP_DIR)
   version_string = ENV['BUNDLE_GEMFILE'].scan(/\d\.\d\.\d/).first
 
-  rails3 = Rails::VERSION::MAJOR == 3
+  rails3 = defined?(Rails) and Rails::VERSION::MAJOR == 3
 
   if rails3
     rails_create_command = 'new'
