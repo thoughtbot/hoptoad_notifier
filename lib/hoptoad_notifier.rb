@@ -13,6 +13,7 @@ require 'hoptoad_notifier/sender'
 require 'hoptoad_notifier/backtrace'
 require 'hoptoad_notifier/rack'
 require 'hoptoad_notifier/user_informer'
+require 'hoptoad_notifier/user_informer_streamer'
 
 require 'hoptoad_notifier/railtie' if defined?(Rails::Railtie)
 
