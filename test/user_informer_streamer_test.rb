@@ -13,9 +13,9 @@ class UserInformerStreamerTest < Test::Unit::TestCase
   end
 
   should "apply a gsub to each chunk out of wrapped #each" do
-    body = ["one", "#<!-- HOPTOAD ERROR -->", "three"]
+    body = ["one", "<!-- HOPTOAD ERROR -->", "three"]
     expected = ["one", "#12345", "three"]
-    streamer = HoptoadNotifier::UserInformerStreamer.new(body, 12345)
+    streamer = HoptoadNotifier::UserInformerStreamer.new(body, "#12345")
     streamer.each do |chunk|
       assert_equal expected.shift, chunk
     end
