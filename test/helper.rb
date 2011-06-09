@@ -174,7 +174,7 @@ class Test::Unit::TestCase
     nodes = document.xpath(xpath)
     assert nodes.any?{|node| node.content == content },
            "Expected xpath #{xpath} to have content #{content}, " +
-           "but found #{nodes.map { |n| n.content }} in #{nodes.size} matching nodes." +
+           "but found #{nodes.map { |n| n.content }} in #{nodes.size} matching nodes.\n" +
            "Document:\n#{document.to_s}"
   end
 end

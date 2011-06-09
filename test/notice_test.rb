@@ -200,6 +200,10 @@ class NoticeTest < Test::Unit::TestCase
         :action           => "action",
         :url              => "http://url.com",
         :parameters       => { "paramskey"     => "paramsvalue",
+                               "to_s_differences" => {
+                                 "nil_value_in_array" => [nil],
+                                 "array_of_strings" => %w(one two three four five)
+                               },
                                "nestparentkey" => { "nestkey" => "nestvalue" } },
         :session_data     => { "sessionkey" => "sessionvalue" },
         :cgi_data         => { "cgikey" => "cgivalue" },
@@ -239,6 +243,13 @@ class NoticeTest < Test::Unit::TestCase
       assert_valid_node(@document, "//request/params/var/@key",     "nestparentkey")
       assert_valid_node(@document, "//request/params/var/var/@key", "nestkey")
       assert_valid_node(@document, "//request/params/var/var",      "nestvalue")
+
+      assert_valid_node(@document, "//request/params/var/@key",     "to_s_differences")
+      assert_valid_node(@document, "//request/params/var/var/@key", "nil_value_in_array")
+      assert_valid_node(@document, "//request/params/var/var",      "[nil]")
+      assert_valid_node(@document, "//request/params/var/var/@key", "array_of_strings")
+      assert_valid_node(@document, "//request/params/var/var",      %{["one", "two", "three", "four", "five"]})
+
       assert_valid_node(@document, "//request/session/var/@key",    "sessionkey")
       assert_valid_node(@document, "//request/session/var",         "sessionvalue")
       assert_valid_node(@document, "//request/cgi-data/var/@key",   "cgikey")
@@ -422,7 +433,7 @@ class NoticeTest < Test::Unit::TestCase
       assert_kind_of Hash, hash[:sub_hash], "subhashes should be kept"
       assert_equal object.to_s, hash[:sub_hash][:sub_object], "subhash members should be serialized"
       assert_kind_of Array, hash[:array], "arrays should be kept"
-      assert_equal object.to_s, hash[:array].first, "array members should be serialized"
+      assert_equal object, hash[:array].first, "array members should not be serialized"
     end
   end
 

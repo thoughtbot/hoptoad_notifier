@@ -37,16 +37,14 @@ class ActionControllerCatcherTest < Test::Unit::TestCase
   end
 
   def assert_sent_element(value, xpath)
-    assert_valid_node last_sent_notice_document, xpath, stringify_array_elements(value).to_s
+    assert_valid_node last_sent_notice_document, xpath, xml_value_for(value)
   end
 
-  def stringify_array_elements(data)
-    if data.respond_to?(:to_ary)
-      data.collect do |value|
-        stringify_array_elements(value)
-      end
+  def xml_value_for(value)
+    if value.nil? || value.is_a?(Array)
+      value.inspect
     else
-      data.to_s
+      value.to_s
     end
   end
 

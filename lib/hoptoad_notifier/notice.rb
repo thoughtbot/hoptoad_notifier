@@ -240,12 +240,12 @@ module HoptoadNotifier
         data.to_hash.inject({}) do |result, (key, value)|
           result.merge(key => clean_unserializable_data(value, stack + [data.object_id]))
         end
-      elsif data.respond_to?(:to_ary)
-        data.collect do |value|
-          clean_unserializable_data(value, stack + [data.object_id])
-        end
       else
-        data.to_s
+        if serializable?(data)
+          data
+        else
+          data.to_s
+        end
       end
     end
 
@@ -310,9 +310,21 @@ module HoptoadNotifier
         if value.respond_to?(:to_hash)
           builder.var(:key => key){|b| xml_vars_for(b, value.to_hash) }
         else
-          builder.var(value.to_s, :key => key)
+          builder.var(xml_value_for(value), :key => key)
         end
       end
+    end
+
+    def xml_value_for(value)
+      if serializable?(value)
+        value.inspect
+      else
+        value.to_s
+      end
+    end
+
+    def serializable?(value)
+      value.nil? || value.is_a?(Array)
     end
 
     def rack_env(method)
